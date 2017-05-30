@@ -4,7 +4,7 @@ void main() {
   final token = 'xoxb-your-slacktoken';
 
   final rtm = new Rtm(token, dumpUnhandle: true)
-    ..on('hello', (msg, sess) {
+    ..on(RtmEvent.hello, (msg, sess) {
       print('>> $msg');
     });
   rtm.connect();
