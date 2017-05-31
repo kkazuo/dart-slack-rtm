@@ -127,8 +127,7 @@ class RtmSession {
       );
     } else {
       final err = json['error'] as String ?? 'error';
-      print(err);
-      throw err;
+      throw new Exception('RTM connect error: $err');
     }
   }
 }
