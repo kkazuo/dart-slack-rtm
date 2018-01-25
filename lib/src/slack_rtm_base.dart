@@ -53,7 +53,7 @@ class Rtm {
   final bool _dumpUnhandle;
   final Duration _pingDuration;
   final Map<String, RtmHandler> _handlers;
-
+  RtmSession sess;
   Rtm(
     this._token, {
     bool dumpUnhandle = false,
@@ -78,11 +78,21 @@ class Rtm {
 
   String _clean(String s) => s.replaceAll(new RegExp(r'[\000-\008]+$'), '');
 
+  Future send(message, response) async {
+    var channel = message['channel'];
+    var data = {
+      "type": "message",
+      "channel": channel,
+      "text": response
+    };
+    sess._ws.add(JSON.encode(data));
+  }
+
   /// Connect to Slack.
   Future connect() async {
     final dumpExcludes = ['reconnect_url', 'pong'];
 
-    final sess = await RtmSession._connect(_token);
+    sess = await RtmSession._connect(_token);
 
     var timer = _pingTimer(sess);
     await for (final msg in sess._ws) {
