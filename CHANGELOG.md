@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0
+
+- Added send, so that you can create bots that respond to messages
+    - by Johan Jäderblom (Jaeder42)
+
 ## 0.1.1
 
 - new Rtm() has configuration optional args.
