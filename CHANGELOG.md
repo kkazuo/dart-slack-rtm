@@ -1,5 +1,9 @@
 # Changelog
 
+## Unrelease
+
+- Fix for Dart2 strong mode
+
 ## 0.2.0
 
 - Added send, so that you can create bots that respond to messages
