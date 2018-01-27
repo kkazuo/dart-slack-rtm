@@ -78,8 +78,8 @@ class Rtm {
 
   String _clean(String s) => s.replaceAll(new RegExp(r'[\000-\008]+$'), '');
 
-  Future send(message, response) async {
-    var channel = message['channel'];
+  Future send(Map<String, dynamic> message, String response) async {
+    var channel = message['channel'] as String;
     var data = {
       "type": "message",
       "channel": channel,
@@ -119,6 +119,10 @@ class RtmSession {
   final WebSocket _ws;
   RtmSession(this.team, this.bot, this._ws);
 
+  void dispose() {
+    _ws.close();
+  }
+
   static Future<RtmSession> _connect(String token) async {
     final url = 'https://slack.com/api/rtm.connect';
 
@@ -129,11 +133,10 @@ class RtmSession {
       final team = json['team'] as Map<String, dynamic>;
       final self = json['self'] as Map<String, dynamic>;
 
-      final ws = await WebSocket.connect(url);
       return new RtmSession(
         new Team.fromJson(team),
         new User.fromJson(self),
-        ws,
+        await WebSocket.connect(url),
       );
     } else {
       final err = json['error'] as String ?? 'error';
