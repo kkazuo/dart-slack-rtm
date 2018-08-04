@@ -1,11 +1,11 @@
 name: slack_rtm
-description: A library for Slack RTM client developers.
-version: 0.2.0
+description: A library for Slack RTM client developers. (https://api.slack.com/rtm)
+version: 0.2.1
 homepage: https://github.com/kkazuo/dart-slack-rtm
 author: Koga Kazuo <obiwanko@me.com>
 
 environment:
-  sdk: '>=1.20.1 <2.0.0'
+  sdk: '>=1.20.1 <3.0.0'
 
 dependencies:
   http: ^0.11.3

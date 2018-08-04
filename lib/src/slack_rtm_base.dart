@@ -69,7 +69,7 @@ class Rtm {
   }
 
   Timer _pingTimer(RtmSession sess) => new Timer(_pingDuration, () {
-        sess._ws.add(JSON.encode({
+        sess._ws.add(jsonEncode({
           'type': 'ping',
           'ping': (new DateTime.now().microsecondsSinceEpoch / 1000000.0)
               .toStringAsFixed(6),
@@ -85,7 +85,7 @@ class Rtm {
       "channel": channel,
       "text": response
     };
-    sess._ws.add(JSON.encode(data));
+    sess._ws.add(jsonEncode(data));
   }
 
   /// Connect to Slack.
@@ -100,7 +100,7 @@ class Rtm {
       timer = _pingTimer(sess);
 
       final str = msg as String;
-      final json = JSON.decode(_clean(str)) as Map<String, dynamic>;
+      final json = jsonDecode(_clean(str)) as Map<String, dynamic>;
       final type = json['type'] as String;
       final hand = _handlers[type];
       if (hand != null) {
@@ -127,7 +127,7 @@ class RtmSession {
     final url = 'https://slack.com/api/rtm.connect';
 
     final response = await http.post(url, body: {'token': token});
-    final json = JSON.decode(response.body) as Map<String, dynamic>;
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
     if (json['ok'] == true) {
       final url = json['url'] as String;
       final team = json['team'] as Map<String, dynamic>;
