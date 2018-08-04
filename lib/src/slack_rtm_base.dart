@@ -58,8 +58,7 @@ class Rtm {
     this._token, {
     bool dumpUnhandle = false,
     Duration pingDuration = const Duration(seconds: 12),
-  })
-      : this._handlers = new Map<String, RtmHandler>(),
+  })  : this._handlers = new Map<String, RtmHandler>(),
         this._dumpUnhandle = dumpUnhandle,
         this._pingDuration = pingDuration;
 
@@ -80,11 +79,7 @@ class Rtm {
 
   Future send(Map<String, dynamic> message, String response) async {
     var channel = message['channel'] as String;
-    var data = {
-      "type": "message",
-      "channel": channel,
-      "text": response
-    };
+    var data = {"type": "message", "channel": channel, "text": response};
     sess._ws.add(jsonEncode(data));
   }
 
