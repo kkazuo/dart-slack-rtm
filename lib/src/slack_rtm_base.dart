@@ -119,7 +119,7 @@ class RtmSession {
   }
 
   static Future<RtmSession> _connect(String token) async {
-    final url = 'https://slack.com/api/rtm.connect';
+    final url = Uri.parse('https://slack.com/api/rtm.connect');
 
     final response = await http.post(url, body: {'token': token});
     final json = jsonDecode(response.body) as Map<String, dynamic>;

@@ -1,8 +1,9 @@
 # Changelog
 
-## Unrelease
+## 0.2.3
 
 - Fix for Dart2 strong mode
+- Update dependencies
 
 ## 0.2.0
 
