@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- Supports Dart 3
+
 ## 0.2.3
 
 - Fix for Dart2 strong mode

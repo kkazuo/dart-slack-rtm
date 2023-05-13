@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'dart:io';
 
-// TODO: Put public facing types in this file.
+import 'package:http/http.dart' as http;
 
 /// Slack Team
 class Team {
@@ -13,7 +12,7 @@ class Team {
 
   const Team(this.id, this.name, this.domain);
 
-  factory Team.fromJson(Map<String, dynamic> j) => new Team(
+  factory Team.fromJson(Map<String, dynamic> j) => Team(
         j['id'] as String,
         j['name'] as String,
         j['domain'] as String,
@@ -33,7 +32,7 @@ class User {
 
   const User(this.id, this.name);
 
-  factory User.fromJson(Map<String, dynamic> j) => new User(
+  factory User.fromJson(Map<String, dynamic> j) => User(
         j['id'] as String,
         j['name'] as String,
       );
@@ -45,7 +44,7 @@ class User {
 }
 
 /// Slack RTM handler
-typedef void RtmHandler(Map<String, dynamic> msg, RtmSession sess);
+typedef RtmHandler = void Function(Map<String, dynamic> msg, RtmSession sess);
 
 /// Slack RTM controller
 class Rtm {
@@ -53,41 +52,44 @@ class Rtm {
   final bool _dumpUnhandle;
   final Duration _pingDuration;
   final Map<String, RtmHandler> _handlers;
-  RtmSession sess;
+  RtmSession? sess;
   Rtm(
     this._token, {
     bool dumpUnhandle = false,
     Duration pingDuration = const Duration(seconds: 12),
-  })  : this._handlers = new Map<String, RtmHandler>(),
-        this._dumpUnhandle = dumpUnhandle,
-        this._pingDuration = pingDuration;
+  })  : _handlers = <String, RtmHandler>{},
+        _dumpUnhandle = dumpUnhandle,
+        _pingDuration = pingDuration;
 
   /// Register message handler
   void on(String type, RtmHandler handler) {
     _handlers[type] = handler;
   }
 
-  Timer _pingTimer(RtmSession sess) => new Timer(_pingDuration, () {
-        sess._ws.add(jsonEncode({
-          'type': 'ping',
-          'ping': (new DateTime.now().microsecondsSinceEpoch / 1000000.0)
-              .toStringAsFixed(6),
-        }));
+  Timer _pingTimer(RtmSession sess) => Timer(_pingDuration, () {
+        sess._ws.add(
+          jsonEncode({
+            'type': 'ping',
+            'ping': (DateTime.now().microsecondsSinceEpoch / 1000000.0)
+                .toStringAsFixed(6),
+          }),
+        );
       });
 
-  String _clean(String s) => s.replaceAll(new RegExp(r'[\000-\008]+$'), '');
+  String _clean(String s) => s.replaceAll(RegExp(r'[\000-\008]+$'), '');
 
   Future send(Map<String, dynamic> message, String response) async {
-    var channel = message['channel'] as String;
-    var data = {"type": "message", "channel": channel, "text": response};
-    sess._ws.add(jsonEncode(data));
+    final channel = message['channel'] as String;
+    final data = {"type": "message", "channel": channel, "text": response};
+    sess?._ws.add(jsonEncode(data));
   }
 
   /// Connect to Slack.
   Future connect() async {
     final dumpExcludes = ['reconnect_url', 'pong'];
 
-    sess = await RtmSession._connect(_token);
+    final sess = await RtmSession._connect(_token);
+    this.sess = sess;
 
     var timer = _pingTimer(sess);
     await for (final msg in sess._ws) {
@@ -101,7 +103,7 @@ class Rtm {
       if (hand != null) {
         hand(json, sess);
       } else if (_dumpUnhandle && !dumpExcludes.contains(type)) {
-        print('$msg');
+        print(msg);
       }
     }
   }
@@ -128,14 +130,14 @@ class RtmSession {
       final team = json['team'] as Map<String, dynamic>;
       final self = json['self'] as Map<String, dynamic>;
 
-      return new RtmSession(
-        new Team.fromJson(team),
-        new User.fromJson(self),
+      return RtmSession(
+        Team.fromJson(team),
+        User.fromJson(self),
         await WebSocket.connect(url),
       );
     } else {
-      final err = json['error'] as String ?? 'error';
-      throw new Exception('RTM connect error: $err');
+      final err = json['error'];
+      throw Exception('RTM connect error: $err');
     }
   }
 }
